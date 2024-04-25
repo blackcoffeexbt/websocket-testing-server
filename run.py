@@ -56,10 +56,15 @@ async def main():
     ws_server = await websockets.serve(handler, "0.0.0.0", 8765)
     print("WebSocket server started at:\nws://localhost:8765")
     
-    # await asyncio.gather(
-    #     websocket_server,
-    #     handle_terminal_input(),
-    # )
+    # Start ngrok tunnel for the WS app
+    http_tunnel = ngrok.connect(8765, bind_tls=True)
+    public_url = http_tunnel.public_url.replace("https", "wss")
+    print()
+    print(f"ngrok tunnel for WS at {public_url}")
+    print()
+    print("Connect with websocat using:")
+    print(f"websocat {public_url}")
+    print()
     
     # Keep the servers running
     await asyncio.Future()  # Run forever
