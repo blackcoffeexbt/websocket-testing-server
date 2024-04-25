@@ -50,8 +50,9 @@ async def main():
     print("WebUI started at:\nhttp://localhost:8080")
 
     # Start WebSocket server
-    ws_server = await websockets.serve(websocket_handler, "localhost", 8765)
-    # print("WebSocket server started at ws://localhost:8765")
+    ws_server = await websockets.serve(websocket_handler, "0.0.0.0", 8765)
+    print("WebSocket server started at:\nws://localhost:8765")
+
     
     # Start ngrok tunnel for the WS app
     http_tunnel = ngrok.connect(8765, bind_tls=True)
