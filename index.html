@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Message to Clients</title>
+</head>
+<body>
+    <h1>Send a message to all connected websocket clients</h1>
+    <p>There are <span id="charcount">0</span> characters in the text</p>
+    <p>There are <span id="bytecount">0</span> bytes in the text</p>
+    <form action="/send" method="post">
+        <textarea id="message" type="text" name="message" placeholder="Enter message" required
+        style="width: 100%; max-width: 800px; height: 200px;"
+        ></textarea>
+        <br>
+        <button type="submit">Send Message</button>
+    </form>
+
+    <!-- javascript to update charcount and bytecount when textarea with id message is updated -->
+    <script>
+        document.getElementById('message').addEventListener('input', function() {
+            var charcount = document.getElementById('charcount');
+            var bytecount = document.getElementById('bytecount');
+            var text = this.value;
+            charcount.textContent = text.length;
+            bytecount.textContent = new Blob([text]).size;
+        });
+    </script>
+</body>
+</html>
