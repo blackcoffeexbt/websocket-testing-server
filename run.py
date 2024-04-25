@@ -6,18 +6,21 @@ from pyngrok import ngrok
 # Store active WebSocket connections in a set
 connected = set()
 
-# WebSocket server handler
-async def websocket_handler(websocket, path):
-    # Add the WebSocket connection to the set of connections
+async def handler(websocket, path):
+    # Add the new client to the set of connected clients
     connected.add(websocket)
     try:
+        # Send a greeting message to the client
+        await websocket.send("hello")
+        # Keep the connection open
         async for message in websocket:
-            print(f"Received message: {message}")
+            print(f"Received message from client: {message}")
+            # Echo back received messages (optional)
             await websocket.send(f"Echo: {message}")
-    except websockets.exceptions.ConnectionClosed:
-        pass
+    except websockets.ConnectionClosed:
+        print("Connection with client closed")
     finally:
-        # Remove connection from set when closed
+        # Remove client from the set when connection is closed
         connected.remove(websocket)
 
 # HTTP server handler to send messages from the web UI
@@ -50,19 +53,13 @@ async def main():
     print("WebUI started at:\nhttp://localhost:8080")
 
     # Start WebSocket server
-    ws_server = await websockets.serve(websocket_handler, "0.0.0.0", 8765)
+    ws_server = await websockets.serve(handler, "0.0.0.0", 8765)
     print("WebSocket server started at:\nws://localhost:8765")
-
     
-    # Start ngrok tunnel for the WS app
-    http_tunnel = ngrok.connect(8765, bind_tls=True)
-    public_url = http_tunnel.public_url.replace("https", "wss")
-    print()
-    print(f"ngrok tunnel for WS at {public_url}")
-    print()
-    print("Connect with websocat using:")
-    print(f"websocat {public_url}")
-    print()
+    # await asyncio.gather(
+    #     websocket_server,
+    #     handle_terminal_input(),
+    # )
     
     # Keep the servers running
     await asyncio.Future()  # Run forever
